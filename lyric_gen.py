@@ -6,15 +6,16 @@ import requests
 import json
 import os.path
 import sys
+import re
 
 textgen = textgenrnn()
 artist_search = ' '.join(sys.argv[1:]).lower()
-api_key = #musixmatch api key here
+api_key = '#musixmatch api key here'
 base_url = 'http://api.musixmatch.com/ws/1.1/'
 get_track = 'matcher.track.get'
 get_lyric = 'track.lyrics.get'
 get_all_tracks = 'track.search'
-before_time = '20190501'
+before_time = '20210101'
 track_list = []
 lyrics_directory = 'lyrics/'
 output_directory = 'output/'
@@ -30,8 +31,10 @@ def get_lyrics_content(track_id):
   s1 = jx['message']['body']['lyrics']['lyrics_body']
   s2 = s1.replace("...\n\n******* This Lyrics is NOT for Commercial use *******", '')
   s3 = s2.replace("\n\n", "\n")
+  s4 = re.sub(r'\([^)]*\)', '', s3)
+
   f = open(lyrics_file, 'a')
-  f.write(s3)
+  f.write(s4)
   f.close()
 
 def get_all_tracks_by_artist():
@@ -56,4 +59,4 @@ else:
     get_all_tracks_by_artist()
 
 textgen.train_from_file(lyrics_file, num_epochs=1)
-textgen.generate_to_file(output_file, n=16)
+textgen.generate_to_file(output_file, n=25)
